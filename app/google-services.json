@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "215368277230",
+    "firebase_url": "https://listacomprasapp-b51d0.firebaseio.com",
+    "project_id": "listacomprasapp-b51d0",
+    "storage_bucket": "listacomprasapp-b51d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215368277230:android:d9c21bcbdc2836ad",
+        "android_client_info": {
+          "package_name": "br.pucpr.appdev.listacomprasapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "215368277230-bv1fuk83msqs8iifgi5kercf7ln3cu71.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.pucpr.appdev.listacomprasapp",
+            "certificate_hash": "0ec884593862d7b3a0f0f1e1a89acb80952c46ff"
+          }
+        },
+        {
+          "client_id": "215368277230-nr0gqd2vc11k08c727k7i3og9lbjdjqg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1JEGqs2R1SKM-V_MdVTKYDWMfXc5dA8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "215368277230-nr0gqd2vc11k08c727k7i3og9lbjdjqg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
