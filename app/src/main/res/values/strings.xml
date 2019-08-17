@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">ListaComprasApp</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_senha">Senha</string>
+    <string name="prompt_confirma_senha">Confirmar Senha</string>
+    <string name="button_entrar">Entrar</string>
+    <string name="button_cadastrar">Cadastrar</string>
+    <string name="button_entrar_google">Entrar com o Google</string>
+    <string name="button_novo_cadastro">Novo Usuário</string>
+
 </resources>
