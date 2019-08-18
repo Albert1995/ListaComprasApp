@@ -7,5 +7,9 @@
     <string name="button_cadastrar">Cadastrar</string>
     <string name="button_entrar_google">Entrar com o Google</string>
     <string name="button_novo_cadastro">Novo Usuário</string>
+    <string name="my_google_api_key">AIzaSyBAuckDT2rfOFHY7-DCewScLThH54DcMmk</string>
+
+    <string name="google_oauth_id_public">421820977602-e0nnrm8ghmhba0s7t7jb5m3pqhr3sqsr.apps.googleusercontent.com</string>
+    <string name="google_oauth_id_private">NtsTD3cD3xqa6sluOGpEGabX</string>
 
 </resources>
