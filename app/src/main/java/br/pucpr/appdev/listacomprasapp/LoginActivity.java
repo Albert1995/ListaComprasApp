@@ -51,7 +51,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void entrarOnClick(View view) {
-        firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
+
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+        /*firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -59,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
                     }
-                });
+                });*/
     }
 
     public void entrarGoogleOnClick(View view) {
