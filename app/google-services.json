@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "215368277230-5h1s1ud31f5k96gei5nbtuu4ii8kj310.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.pucpr.appdev.listacomprasapp",
+            "certificate_hash": "87e04664472dcb3ba588d3d84327675a2ac8b2ea"
+          }
+        },
+        {
           "client_id": "215368277230-ddndb4poa9mm0nhugmc84sdse8rnuieo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

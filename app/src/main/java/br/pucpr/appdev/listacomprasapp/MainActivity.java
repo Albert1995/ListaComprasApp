@@ -15,8 +15,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -58,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         db.setFirestoreSettings(settings);
-        //helper = new FirebaseHelper(db);
+        helper = new FirebaseHelper(db);
 
         //ADAPTER
-        //adapter = new CustomAdapter(this, helper.retrieve());
-        //lv.setAdapter(adapter);
+        adapter = new CustomAdapter(this, helper.retrieve());
+        lv.setAdapter(adapter);
     }
 
 
@@ -83,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
             displayInputDialog();
-            //Toast.makeText(this, "Deu boa!!!!", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -142,24 +143,7 @@ public class MainActivity extends AppCompatActivity {
         Map<String, Object> doc = new HashMap<>();
         doc.put("nome", nome);
 
-        db.collection("Categorias")
-                .add(doc)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        pg.dismiss();
-                        Toast.makeText(MainActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        pg.dismiss();
-                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        /*db.collection("Categorias").document(id).set(doc)
+        db.collection("Categorias").document(id).set(doc)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -172,6 +156,6 @@ public class MainActivity extends AppCompatActivity {
                 pg.dismiss();
                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });*/
+        });
     }
 }
