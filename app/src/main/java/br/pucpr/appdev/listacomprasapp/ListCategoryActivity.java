@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -39,6 +40,7 @@ public class ListCategoryActivity extends AppCompatActivity {
     EditText edtNomeCateg;
 
     FirebaseFirestore db;
+    FirebaseAuth auth;
 
     CustomAdapter adapter;
 
@@ -50,6 +52,7 @@ public class ListCategoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_category);
 
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         mReclycleView = findViewById(R.id.recycler_view);
         mAddBtn = findViewById(R.id.addBtn);
@@ -74,7 +77,7 @@ public class ListCategoryActivity extends AppCompatActivity {
         pd.setTitle("Carregando Dados..");
         pd.show();
 
-        db.collection("Categorias")
+        db.collection("Categorias").whereEqualTo("idUsuario", auth.getCurrentUser().getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -83,8 +86,8 @@ public class ListCategoryActivity extends AppCompatActivity {
                         pd.dismiss();
 
                         for (DocumentSnapshot doc : task.getResult()) {
-                            Categoria categoria = new Categoria(doc.getString("nome"), doc.getString("id"));
-                            categoriaList.add(categoria);
+                                Categoria categoria = new Categoria(doc.getString("nome"), doc.getString("id"), doc.getString("idUsuario"));
+                                categoriaList.add(categoria);
                         }
 
                         adapter = new CustomAdapter(ListCategoryActivity.this, categoriaList);
@@ -173,6 +176,7 @@ public class ListCategoryActivity extends AppCompatActivity {
         Map<String, Object> doc = new HashMap<>();
         doc.put("nome", nome);
         doc.put("id", id);
+        doc.put("idUsuario", auth.getCurrentUser().getUid());
 
         db.collection("Categorias").document(id).set(doc)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
