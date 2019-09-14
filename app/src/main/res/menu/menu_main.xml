@@ -6,9 +6,9 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_add"
+        android:id="@+id/logout"
         android:orderInCategory="200"
         android:title="Search"
-        android:icon="@drawable/ic_launcher_foreground"
+        android:icon="@drawable/ic_action_logout"
         app:showAsAction="ifRoom"/>
 </menu>

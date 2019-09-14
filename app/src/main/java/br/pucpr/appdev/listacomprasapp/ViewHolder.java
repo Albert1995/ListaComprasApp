@@ -44,4 +44,28 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     public void setOnClickListener(ViewHolder.ClickListener clickListener){
         mClickListener = clickListener;
     }
+
+    public TextView getmNome() {
+        return mNome;
+    }
+
+    public void setmNome(TextView mNome) {
+        this.mNome = mNome;
+    }
+
+    public View getmView() {
+        return mView;
+    }
+
+    public void setmView(View mView) {
+        this.mView = mView;
+    }
+
+    public ClickListener getmClickListener() {
+        return mClickListener;
+    }
+
+    public void setmClickListener(ClickListener mClickListener) {
+        this.mClickListener = mClickListener;
+    }
 }

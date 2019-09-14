@@ -9,9 +9,13 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,12 +42,9 @@ public class ListCategoryActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
     FloatingActionButton mAddBtn;
     EditText edtNomeCateg;
-
     FirebaseFirestore db;
     FirebaseAuth auth;
-
     CustomAdapter adapter;
-
     ProgressDialog pd;
 
     @Override
@@ -71,6 +72,26 @@ public class ListCategoryActivity extends AppCompatActivity {
                 displayInputDialog();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.logout:
+                auth.signOut();
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void showData() {
@@ -192,5 +213,11 @@ public class ListCategoryActivity extends AppCompatActivity {
                 Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void showSubLista(Categoria c) {
+        Intent i = new Intent(this, SubCategoriaActivity.class);
+        i.putExtra("categoria", c);
+        startActivity(i);
     }
 }

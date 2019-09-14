@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private GoogleSignInClient googleSignInClient;
     private int GOOGLE_SIGN_IN = 1000;
+    ProgressDialog pd;
 
     private EditText email, senha;
 
@@ -44,6 +46,14 @@ public class LoginActivity extends AppCompatActivity {
     private void setUp() {
         email = findViewById(R.id.email);
         senha = findViewById(R.id.senha);
+        pd = new ProgressDialog(this);
+
+        pd.setTitle("Validando..");
+        pd.show();
+        if (firebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(LoginActivity.this, ListCategoryActivity.class));
+        }
+        pd.dismiss();
     }
 
     public void novoUsuarioOnClick(View view) {
@@ -53,19 +63,23 @@ public class LoginActivity extends AppCompatActivity {
     public void entrarOnClick(View view) {
 
         //startActivity(new Intent(LoginActivity.this, MainActivity.class));
-
+        pd.setTitle("Entrando..");
+        pd.show();
         firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             startActivity(new Intent(LoginActivity.this, ListCategoryActivity.class));
+                            pd.dismiss();
                         }
                     }
                 });
     }
 
     public void entrarGoogleOnClick(View view) {
+        pd.setTitle("Entrando..");
+        pd.show();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -88,7 +102,8 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    startActivity(new Intent(LoginActivity.this, ListCategoryActivity.class));
+                                    pd.dismiss();
                                 } else {
                                     task.getException().printStackTrace();
                                 }

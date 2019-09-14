@@ -1,8 +1,12 @@
 package br.pucpr.appdev.listacomprasapp.Model;
 
-public class Categoria {
+import java.io.Serializable;
+import java.util.List;
+
+public class Categoria implements Serializable {
 
     String nome,id,idUsuario;
+    List<SubCategoria> lista;
 
     public Categoria(String nome, String id, String idUsuario) {
         this.nome = nome;
