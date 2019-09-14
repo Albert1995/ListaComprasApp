@@ -43,7 +43,7 @@ public class CustomAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             @Override
             public void onItemLongClick(View view, int position) {
-
+                listActivity.deleteData(position);
             }
         });
 

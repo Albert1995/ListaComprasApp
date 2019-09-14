@@ -70,7 +70,7 @@ public class ListCategoryActivity extends AppCompatActivity {
         });
     }
 
-    private void showData(){
+    private void showData() {
         pd.setTitle("Carregando Dados..");
         pd.show();
 
@@ -79,17 +79,17 @@ public class ListCategoryActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                         pd.dismiss();
+                        categoriaList.clear();
+                        pd.dismiss();
 
-                         categoriaList.clear();
-                         for (DocumentSnapshot doc: task.getResult()){
-                             Categoria categoria = new Categoria(doc.getString("nome"));
-                             categoriaList.add(categoria);
-                         }
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            Categoria categoria = new Categoria(doc.getString("nome"), doc.getString("id"));
+                            categoriaList.add(categoria);
+                        }
 
-                         adapter = new CustomAdapter(ListCategoryActivity.this, categoriaList);
+                        adapter = new CustomAdapter(ListCategoryActivity.this, categoriaList);
 
-                         mReclycleView.setAdapter(adapter);
+                        mReclycleView.setAdapter(adapter);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -97,6 +97,27 @@ public class ListCategoryActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         pd.dismiss();
 
+                        Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void deleteData(int index) {
+        pd.setTitle("Deletando o dado..");
+        pd.show();
+
+        db.collection("Categorias").document(categoriaList.get(index).getId())
+                .delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(ListCategoryActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
+                        showData();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
                         Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -151,6 +172,7 @@ public class ListCategoryActivity extends AppCompatActivity {
 
         Map<String, Object> doc = new HashMap<>();
         doc.put("nome", nome);
+        doc.put("id", id);
 
         db.collection("Categorias").document(id).set(doc)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
