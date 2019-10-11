@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -27,13 +28,21 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import br.pucpr.appdev.listacomprasapp.Model.APIResponse;
 import br.pucpr.appdev.listacomprasapp.Model.Categoria;
+import br.pucpr.appdev.listacomprasapp.webservices.ServiceBuilder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static br.pucpr.appdev.listacomprasapp.webservices.ServiceBuilder.getCategoriaService;
 
 public class ListCategoryActivity extends AppCompatActivity {
 
@@ -97,7 +106,7 @@ public class ListCategoryActivity extends AppCompatActivity {
     private void showData() {
         pd.setTitle("Carregando Dados..");
         pd.show();
-
+        /*
         db.collection("Categorias").whereEqualTo("idUsuario", auth.getCurrentUser().getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -124,12 +133,37 @@ public class ListCategoryActivity extends AppCompatActivity {
                         Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+                */
+        ServiceBuilder.getCategoriaService().getAll().enqueue(new Callback<List<Categoria>>() {
+            @Override
+            public void onResponse(Call<List<Categoria>> call, Response<List<Categoria>> response) {
+                if (response.isSuccessful()) {
+                    categoriaList.clear();
+                    List<Categoria> resultado = response.body();
+                    for (Categoria c : resultado) {
+                        if (auth.getCurrentUser().getUid().equals(c.getIdUsuario()))
+                            categoriaList.add(c);
+                    }
+                    adapter = new CustomAdapter(ListCategoryActivity.this, categoriaList);
+                    mReclycleView.setAdapter(adapter);
+                }
+                pd.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<List<Categoria>> call, Throwable t) {
+                Toast.makeText(ListCategoryActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                pd.dismiss();
+            }
+        });
+
     }
 
     public void deleteData(int index) {
         pd.setTitle("Deletando o dado..");
         pd.show();
 
+        /*
         db.collection("Categorias").document(categoriaList.get(index).getId())
                 .delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -145,6 +179,22 @@ public class ListCategoryActivity extends AppCompatActivity {
                         Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+                */
+
+        ServiceBuilder.getCategoriaService().delete(categoriaList.get(index).getId()).enqueue(new Callback<APIResponse>() {
+            @Override
+            public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
+                Toast.makeText(ListCategoryActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
+                showData();
+            }
+
+            @Override
+            public void onFailure(Call<APIResponse> call, Throwable t) {
+                Toast.makeText(ListCategoryActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
 
@@ -194,10 +244,12 @@ public class ListCategoryActivity extends AppCompatActivity {
 
         String id = UUID.randomUUID().toString();
 
+        /*
         Map<String, Object> doc = new HashMap<>();
         doc.put("nome", nome);
         doc.put("id", id);
         doc.put("idUsuario", auth.getCurrentUser().getUid());
+
 
         db.collection("Categorias").document(id).set(doc)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -211,6 +263,22 @@ public class ListCategoryActivity extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
                 pd.dismiss();
                 Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        */
+
+        ServiceBuilder.getCategoriaService().create(new Categoria(nome, id, auth.getCurrentUser().getUid())).enqueue(new Callback<APIResponse>() {
+            @Override
+            public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
+                pd.dismiss();
+                Toast.makeText(ListCategoryActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<APIResponse> call, Throwable t) {
+                t.printStackTrace();
+                pd.dismiss();
+                Toast.makeText(ListCategoryActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
