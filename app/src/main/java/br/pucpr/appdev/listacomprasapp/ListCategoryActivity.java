@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,14 +57,18 @@ public class ListCategoryActivity extends AppCompatActivity {
     FirebaseAuth auth;
     CustomAdapter adapter;
     ProgressDialog pd;
+    SharedPreferences prefs;
+    String token, uuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_category);
 
+        getAuth();
+
         db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        //auth = FirebaseAuth.getInstance();
 
         mReclycleView = findViewById(R.id.recycler_view);
         mAddBtn = findViewById(R.id.addBtn);
@@ -134,14 +140,14 @@ public class ListCategoryActivity extends AppCompatActivity {
                     }
                 });
                 */
-        ServiceBuilder.getCategoriaService().getAll().enqueue(new Callback<List<Categoria>>() {
+        ServiceBuilder.getCategoriaService(token).getAll(uuid).enqueue(new Callback<List<Categoria>>() {
             @Override
             public void onResponse(Call<List<Categoria>> call, Response<List<Categoria>> response) {
                 if (response.isSuccessful()) {
                     categoriaList.clear();
                     List<Categoria> resultado = response.body();
                     for (Categoria c : resultado) {
-                        if (auth.getCurrentUser().getUid().equals(c.getIdUsuario()))
+                        if (uuid.equals(c.getIdUsuario()))
                             categoriaList.add(c);
                     }
                     adapter = new CustomAdapter(ListCategoryActivity.this, categoriaList);
@@ -181,7 +187,7 @@ public class ListCategoryActivity extends AppCompatActivity {
                 });
                 */
 
-        ServiceBuilder.getCategoriaService().delete(categoriaList.get(index).getId()).enqueue(new Callback<APIResponse>() {
+        ServiceBuilder.getCategoriaService(token).delete(categoriaList.get(index).getId()).enqueue(new Callback<APIResponse>() {
             @Override
             public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
                 Toast.makeText(ListCategoryActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
@@ -267,11 +273,12 @@ public class ListCategoryActivity extends AppCompatActivity {
         });
         */
 
-        ServiceBuilder.getCategoriaService().create(new Categoria(nome, id, auth.getCurrentUser().getUid())).enqueue(new Callback<APIResponse>() {
+        ServiceBuilder.getCategoriaService(token).create(new Categoria(nome, id, uuid)).enqueue(new Callback<APIResponse>() {
             @Override
             public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
                 pd.dismiss();
                 Toast.makeText(ListCategoryActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                showData();
             }
 
             @Override
@@ -287,5 +294,11 @@ public class ListCategoryActivity extends AppCompatActivity {
         Intent i = new Intent(this, SubCategoriaActivity.class);
         i.putExtra("categoria", c);
         startActivity(i);
+    }
+
+    private void getAuth() {
+        prefs = getApplicationContext().getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
+        token = prefs.getString("token","");
+        uuid = prefs.getString("uuid","");
     }
 }

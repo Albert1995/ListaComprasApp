@@ -13,10 +13,10 @@ import retrofit2.http.Path;
 
 public interface CategoriaService {
 
-    @GET("/categorias")
-    Call<List<Categoria>> getAll();
+    @GET("/categorias/getAll/{uuid}")
+    Call<List<Categoria>> getAll(@Path("uuid") String uuid);
 
-    @POST("/novaCategoria")
+    @POST("/categorias")
     Call<APIResponse> create(@Body Categoria categoria);
 
     @DELETE("/excluirCategoria/{id}")

@@ -17,6 +17,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.auth.FirebaseAuthCredentialsProvider;
 
+import br.pucpr.appdev.listacomprasapp.Model.APIResponse;
+import br.pucpr.appdev.listacomprasapp.Model.Categoria;
+import br.pucpr.appdev.listacomprasapp.Model.Usuario;
+import br.pucpr.appdev.listacomprasapp.webservices.ServiceBuilder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class CadastroActivity extends AppCompatActivity {
 
     private EditText email, senha, confirmaSenha;
@@ -104,14 +112,28 @@ public class CadastroActivity extends AppCompatActivity {
 
     public void cadastrarOnClick(View view) {
         if (validateForm()) {
-            firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            Toast.makeText(CadastroActivity.this, "Você foi cadastrado com sucesso.", Toast.LENGTH_LONG).show();
-                            CadastroActivity.this.finish();
-                        }
-                    });
+            //firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
+            //        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            //            @Override
+            //            public void onComplete(@NonNull Task<AuthResult> task) {
+            //                Toast.makeText(CadastroActivity.this, "Você foi cadastrado com sucesso.", Toast.LENGTH_LONG).show();
+            //                CadastroActivity.this.finish();
+            //            }
+            //        });
+
+            ServiceBuilder.getUsuarioService().create(new Usuario(email.getText().toString(), senha.getText().toString())).enqueue(new Callback<APIResponse>() {
+                @Override
+                public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
+                    Toast.makeText(CadastroActivity.this, "Você foi cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                    CadastroActivity.this.finish();
+                }
+
+                @Override
+                public void onFailure(Call<APIResponse> call, Throwable t) {
+                    t.printStackTrace();
+                    Toast.makeText(CadastroActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }
