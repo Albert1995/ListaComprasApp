@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,8 +31,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import br.pucpr.appdev.listacomprasapp.Adapter.CategoryItemAdapter;
+import br.pucpr.appdev.listacomprasapp.Model.APIResponse;
 import br.pucpr.appdev.listacomprasapp.Model.Categoria;
 import br.pucpr.appdev.listacomprasapp.Model.SubCategoria;
+import br.pucpr.appdev.listacomprasapp.webservices.ServiceBuilder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SubCategoriaActivity extends AppCompatActivity {
 
@@ -41,11 +48,14 @@ public class SubCategoriaActivity extends AppCompatActivity {
     CategoryItemAdapter adapter;
     FloatingActionButton addBtn;
     ProgressDialog pd;
+    SharedPreferences prefs;
+    String token, uuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_itens);
+        getAuth();
 
         // Firebase
         db = FirebaseFirestore.getInstance();
@@ -108,21 +118,35 @@ public class SubCategoriaActivity extends AppCompatActivity {
     private void getListaFromDB() {
         pd.setTitle("Carregando Dados..");
         pd.show();
-        db.collection("SubCategorias")
-                .whereEqualTo("categoria", categoria.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (DocumentSnapshot ds : task.getResult()) {
-                            lista.add(new SubCategoria(ds.getId(), ds.getString("descricao")));
-                        }
+        showDataSubCategoria();
+    }
 
-                        adapter = new CategoryItemAdapter(lista);
-                        recyclerView.setAdapter(adapter);
-                        pd.dismiss();
+    private void showDataSubCategoria() {
+        pd.setTitle("Carregando Dados..");
+        pd.show();
+
+        ServiceBuilder.getSubCategoriaService(token).getAll(categoria.getId()).enqueue(new Callback<List<SubCategoria>>() {
+            @Override
+            public void onResponse(Call<List<SubCategoria>> call, Response<List<SubCategoria>> response) {
+                if (response.isSuccessful()) {
+                    lista.clear();
+                    List<SubCategoria> resultado = response.body();
+                    for (SubCategoria c : resultado) {
+                        lista.add(c);
                     }
-                });
+                    adapter = new CategoryItemAdapter(SubCategoriaActivity.this, lista);
+                    recyclerView.setAdapter(adapter);
+                }
+                pd.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<List<SubCategoria>> call, Throwable t) {
+                Toast.makeText(SubCategoriaActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                pd.dismiss();
+            }
+        });
+
     }
 
     private void save(final String descricao) {
@@ -130,28 +154,54 @@ public class SubCategoriaActivity extends AppCompatActivity {
         pd.show();
         final String id = UUID.randomUUID().toString();
 
-        Map<String, Object> doc = new HashMap<>();
-        doc.put("id", id);
-        doc.put("descricao", descricao);
-        doc.put("categoria", categoria.getId());
-
-        db.collection("SubCategorias").document(id).set(doc)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        //Toast.makeText(SubCategoriaActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
-                        lista.add(new SubCategoria(id, descricao));
-                        adapter.notifyDataSetChanged();
-                        pd.dismiss();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
+        ServiceBuilder.getSubCategoriaService(token).create(new SubCategoria(id, descricao, categoria.getId())).enqueue(new Callback<APIResponse>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
                 pd.dismiss();
-                Toast.makeText(SubCategoriaActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SubCategoriaActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                showDataSubCategoria();
+            }
+
+            @Override
+            public void onFailure(Call<APIResponse> call, Throwable t) {
+                t.printStackTrace();
+                pd.dismiss();
+                Toast.makeText(SubCategoriaActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    public void deleteData(int index) {
+        pd.setTitle("Deletando o dado..");
+        pd.show();
 
+        SubCategoria subCat = lista.get(index);
+
+        ServiceBuilder.getSubCategoriaService(token).delete(subCat.getId()).enqueue(new Callback<APIResponse>() {
+            @Override
+            public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
+                if(response.code() == 200) {
+                    Toast.makeText(SubCategoriaActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
+                    pd.dismiss();
+                    showDataSubCategoria();
+                }
+                else{
+                    Toast.makeText(SubCategoriaActivity.this, "Não foi possível realizar esta operação!", Toast.LENGTH_SHORT).show();
+                    pd.dismiss();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<APIResponse> call, Throwable t) {
+                Toast.makeText(SubCategoriaActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                pd.dismiss();
+            }
+        });
+    }
+
+    private void getAuth() {
+        prefs = getApplicationContext().getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
+        token = prefs.getString("token","");
+        uuid = prefs.getString("uuid","");
+    }
 }

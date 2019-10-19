@@ -11,18 +11,22 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
+import br.pucpr.appdev.listacomprasapp.ListCategoryActivity;
 import br.pucpr.appdev.listacomprasapp.Model.SubCategoria;
 import br.pucpr.appdev.listacomprasapp.R;
+import br.pucpr.appdev.listacomprasapp.SubCategoriaActivity;
 import br.pucpr.appdev.listacomprasapp.ViewHolder;
 
 public class CategoryItemAdapter extends RecyclerView.Adapter<ViewHolder> {
 
+    SubCategoriaActivity listActivity;
     private List<SubCategoria> lista;
-    private FirebaseFirestore db;
+    //private FirebaseFirestore db;
 
-    public CategoryItemAdapter(List<SubCategoria> lista) {
+    public CategoryItemAdapter(SubCategoriaActivity listActivity, List<SubCategoria> lista) {
         this.lista = lista;
-        db = FirebaseFirestore.getInstance();
+        this.listActivity = listActivity;
+        //db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -41,9 +45,14 @@ public class CategoryItemAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             @Override
             public void onItemLongClick(View view, int position) {
+                listActivity.deleteData(position);
+                /*
                 db.collection("SubCategorias").document(lista.get(position).getId()).delete();
                 lista.remove(position);
                 notifyDataSetChanged();
+                 */
+
+
             }
         });
         return viewHolder;

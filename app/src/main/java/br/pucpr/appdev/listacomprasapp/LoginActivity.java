@@ -71,21 +71,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void entrarOnClick(View view) {
-
-        //startActivity(new Intent(LoginActivity.this, MainActivity.class));
         pd.setTitle("Entrando..");
         pd.show();
-
-        //firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
-        //        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-        //            @Override
-        //            public void onComplete(@NonNull Task<AuthResult> task) {
-        //                if (task.isSuccessful()) {
-        //                    startActivity(new Intent(LoginActivity.this, ListCategoryActivity.class));
-        //                    pd.dismiss();
-        //               }
-        //            }
-        //        });
 
         ServiceBuilder.getUsuarioService().login(new Usuario(email.getText().toString(), senha.getText().toString())).enqueue(new Callback<Auth>() {
             @Override

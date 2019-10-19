@@ -112,14 +112,6 @@ public class CadastroActivity extends AppCompatActivity {
 
     public void cadastrarOnClick(View view) {
         if (validateForm()) {
-            //firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(), senha.getText().toString())
-            //        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            //            @Override
-            //            public void onComplete(@NonNull Task<AuthResult> task) {
-            //                Toast.makeText(CadastroActivity.this, "Você foi cadastrado com sucesso.", Toast.LENGTH_LONG).show();
-            //                CadastroActivity.this.finish();
-            //            }
-            //        });
 
             ServiceBuilder.getUsuarioService().create(new Usuario(email.getText().toString(), senha.getText().toString())).enqueue(new Callback<APIResponse>() {
                 @Override

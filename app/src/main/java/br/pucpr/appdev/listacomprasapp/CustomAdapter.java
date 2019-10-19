@@ -18,7 +18,6 @@ public class CustomAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     ListCategoryActivity listActivity;
     List<Categoria> categoriaList;
-    Context context;
 
     public CustomAdapter(ListCategoryActivity listActivity, List<Categoria> categoriaList) {
         this.listActivity = listActivity;

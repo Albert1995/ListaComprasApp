@@ -19,8 +19,8 @@ public interface CategoriaService {
     @POST("/categorias")
     Call<APIResponse> create(@Body Categoria categoria);
 
-    @DELETE("/excluirCategoria/{id}")
-    Call<APIResponse> delete(@Path("id") String id);
+    @DELETE("/categorias/excluirCategoria/{id}/{idUsuario}")
+    Call<APIResponse> delete(@Path("id") String id, @Path("idUsuario") String idUsuario);
 
 
 }

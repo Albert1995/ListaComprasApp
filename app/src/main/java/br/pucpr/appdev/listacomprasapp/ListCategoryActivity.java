@@ -1,13 +1,11 @@
 package br.pucpr.appdev.listacomprasapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,23 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import br.pucpr.appdev.listacomprasapp.Model.APIResponse;
@@ -43,8 +30,6 @@ import br.pucpr.appdev.listacomprasapp.webservices.ServiceBuilder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static br.pucpr.appdev.listacomprasapp.webservices.ServiceBuilder.getCategoriaService;
 
 public class ListCategoryActivity extends AppCompatActivity {
 
@@ -112,34 +97,7 @@ public class ListCategoryActivity extends AppCompatActivity {
     private void showData() {
         pd.setTitle("Carregando Dados..");
         pd.show();
-        /*
-        db.collection("Categorias").whereEqualTo("idUsuario", auth.getCurrentUser().getUid())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        categoriaList.clear();
-                        pd.dismiss();
 
-                        for (DocumentSnapshot doc : task.getResult()) {
-                                Categoria categoria = new Categoria(doc.getString("nome"), doc.getString("id"), doc.getString("idUsuario"));
-                                categoriaList.add(categoria);
-                        }
-
-                        adapter = new CustomAdapter(ListCategoryActivity.this, categoriaList);
-
-                        mReclycleView.setAdapter(adapter);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        pd.dismiss();
-
-                        Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                */
         ServiceBuilder.getCategoriaService(token).getAll(uuid).enqueue(new Callback<List<Categoria>>() {
             @Override
             public void onResponse(Call<List<Categoria>> call, Response<List<Categoria>> response) {
@@ -169,38 +127,28 @@ public class ListCategoryActivity extends AppCompatActivity {
         pd.setTitle("Deletando o dado..");
         pd.show();
 
-        /*
-        db.collection("Categorias").document(categoriaList.get(index).getId())
-                .delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(ListCategoryActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
-                        showData();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                */
+        Categoria cat = categoriaList.get(index);
 
-        ServiceBuilder.getCategoriaService(token).delete(categoriaList.get(index).getId()).enqueue(new Callback<APIResponse>() {
+        ServiceBuilder.getCategoriaService(token).delete(cat.getId(), cat.getIdUsuario()).enqueue(new Callback<APIResponse>() {
             @Override
             public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
-                Toast.makeText(ListCategoryActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
-                showData();
+                if(response.code() == 200) {
+                    Toast.makeText(ListCategoryActivity.this, "Deletado!", Toast.LENGTH_SHORT).show();
+                    pd.dismiss();
+                    showData();
+                }
+                else{
+                    Toast.makeText(ListCategoryActivity.this, "Não foi possível realizar esta operação!", Toast.LENGTH_SHORT).show();
+                    pd.dismiss();
+                }
             }
 
             @Override
             public void onFailure(Call<APIResponse> call, Throwable t) {
                 Toast.makeText(ListCategoryActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                pd.dismiss();
             }
         });
-
-
     }
 
 
@@ -249,29 +197,6 @@ public class ListCategoryActivity extends AppCompatActivity {
         pd.show();
 
         String id = UUID.randomUUID().toString();
-
-        /*
-        Map<String, Object> doc = new HashMap<>();
-        doc.put("nome", nome);
-        doc.put("id", id);
-        doc.put("idUsuario", auth.getCurrentUser().getUid());
-
-
-        db.collection("Categorias").document(id).set(doc)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        pd.dismiss();
-                        Toast.makeText(ListCategoryActivity.this, "Cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                pd.dismiss();
-                Toast.makeText(ListCategoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-        */
 
         ServiceBuilder.getCategoriaService(token).create(new Categoria(nome, id, uuid)).enqueue(new Callback<APIResponse>() {
             @Override
